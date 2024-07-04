@@ -21,3 +21,21 @@ inference_config = InferenceConfig(runtime= "python", entry_script="score.py", c
 
 service = Model.deploy(workspace=workspace, name='service1', models=[model], inference_config=inference_config, deployment_config=aci_config) 
 service.wait_for_deployment(show_output=True)
+
+
+#Part 4 Testing the deployed model
+import requests 
+import json 
+test_sample = json.dumps({'data': [ ['finalWorth'], ]}) 
+test_sample = bytes(test_sample, encoding='utf8') 
+scoring_uri = service.scoring_uri
+headers = {'Content-Type':'application/json'} 
+response = requests.post(scoring_uri, data=test_sample, headers=headers) 
+print("Prediction: ", response.text) 
+
+#Part 5
+
+service.update(enable_app_insights=True) 
+
+logs = service.get_logs() 
+print(logs)
